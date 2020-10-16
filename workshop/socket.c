@@ -7,7 +7,12 @@
 #define MAX_LEN 1024
 #define PORT 22110
 
-int main() {
+int main(int argCount, char** args) {
+
+    printf("Arguements (%d) are: \n", argCount);
+    for (int i = 0; i < argCount; i++) {
+        printf("Arg %d: %s\n", i, args[i]);
+    }
 
     printf("Net Listen Test on UDP port %d:\n", PORT);
     printf("Connect using: \n");
@@ -23,8 +28,12 @@ int main() {
     // Create socket for UDP
     int socketDescriptor = socket(PF_INET, SOCK_DGRAM, 0);
 
+    // CHECK ERRORS
+
     // Bind socket to the port we specified
     bind (socketDescriptor, (struct sockaddr*) &sin, sizeof(sin));
+
+    // CHECK RETURN VALUES
 
     while (1) {
         // Get data (blocking)
@@ -38,7 +47,9 @@ int main() {
         // Null terminated (string)
         int terminateIdx = (bytesRx < MAX_LEN) ? bytesRx : MAX_LEN - 1;
         messageRx[terminateIdx] = 0;
-        printf("Message received (%d bytes): '%s'\n", bytesRx, messageRx);
+        // printf("Message received (%d bytes): '%s'\n", bytesRx, messageRx);
+        long remotePort = ntohs(sinRemote.sin_port);
+        printf("(Port%ld) %s", remotePort, messageRx);
 
         // Extract value from message
         // proccess msg any way app requires
