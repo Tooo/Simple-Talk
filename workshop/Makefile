@@ -8,8 +8,8 @@ socket: socket.c
 thread: thread.c sleep.c
 	gcc $(CFLAGS) thread.c sleep.c -lpthread -o thread
 
-thread2: thread2.c sleep.c
-	gcc $(CFLAGS) thread2.c sleep.c -lpthread -o thread2
+thread2: thread2.c sleep.c receiver.c
+	gcc $(CFLAGS) thread2.c receiver.c -lpthread -o thread2
 	
 clean:
 	rm -f socket thread thread2

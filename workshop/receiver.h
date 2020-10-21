@@ -1,7 +1,13 @@
 #ifndef _RECEIVER_H_
 #define _RECEIVER_H_
 
-void Receiver_init();
-void Receiver_shutdown();
+// Start background receive thread
+void Receiver_init(char* rxMessage);
+
+// Set dynamic message -- Threadsafe
+void Receiver_changeDynamicMessage(char* newDynamic);
+
+// Stop background receive thread and cleanup
+void Receiver_shutdown(void);
 
 #endif
