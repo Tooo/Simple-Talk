@@ -12,7 +12,7 @@
 
 static int socketDescriptor;
 
-void* slowPrintThread(void * unused) {
+void* receiveThread(void * unused) {
     //Address
     struct sockaddr_in sin;                     //_in means internet
     memset(&sin, 0, sizeof(sin));
@@ -66,24 +66,26 @@ void* slowPrintThread(void * unused) {
 }
 
 int main (int arc, char** args) {
-    printf("**** DONE PROGRAM *****\n");
+    printf("Starting\n");
 
     pthread_t threadPID;
     pthread_create(
         &threadPID,         // PID (by pointer)
         NULL,               // Attributes
-        slowPrintThread,    // Functions
+        receiveThread,    // Functions
         "This is the new arg\n");              // Arguments
 
-    pthread_t threadPID2;
-    pthread_create(
-        &threadPID2,         // PID (by pointer)
-        NULL,               // Attributes
-        slowPrintThread,    // Functions
-        "*********************oops\n");              // Arguments
+    // Wait for user input
+    printf("Enter something to kill thread");
+    char x;
+    scanf("%c", &x);
 
+    // Cancel thread
+    pthread_cancel(threadPID);
+
+    // waits for thread to finish
     pthread_join(threadPID, NULL);
-    pthread_join(threadPID2, NULL);
 
+    printf("Done\n");
     return 0;
 }
