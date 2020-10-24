@@ -18,4 +18,4 @@ condition2: condition2.c signaller.c printer.c sleep.c
 	gcc $(CFLAGS) condition2.c signaller.c printer.c sleep.c -lpthread -o condition2
 
 clean:
-	rm -f socket thread thread2 condition
+	rm -f socket thread thread2 condition condition2

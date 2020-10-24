@@ -2,6 +2,6 @@
 #define _SIGNALLER_H_
 
 void Signaller_init();
-void Signaller_shutdown();
+void Signaller_waitForShutdown();
 
 #endif
