@@ -1,6 +1,6 @@
 CFLAGS = -Wall -g -std=c99 -D _POSIX_C_SOURCE=200809L -Werror
 
-all: socket thread thread2
+all: socket thread thread2 condition
 
 socket: socket.c
 	gcc $(CFLAGS) socket.c -lpthread -o socket
@@ -10,6 +10,9 @@ thread: thread.c sleep.c
 
 thread2: thread2.c sleep.c receiver.c
 	gcc $(CFLAGS) thread2.c receiver.c -lpthread -o thread2
-	
+
+condition: condition.c sleep.c
+	gcc $(CFLAGS) condition.c sleep.c -lpthread -o condition
+
 clean:
-	rm -f socket thread thread2
+	rm -f socket thread thread2 condition
