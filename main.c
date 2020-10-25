@@ -1,5 +1,12 @@
 #include <stdio.h>
 
+#include "list.h"
+
+#include "keyboard.h"
+#include "sender.h"
+#include "receiver.h"
+#include "screen.h"
+
 int main (int arc, char** args) {
 
     if (arc != 4) {
@@ -11,6 +18,10 @@ int main (int arc, char** args) {
     for (int i = 0; i < arc; i++) {
         printf("%s\n", args[i]);
     }
+
+    List * list = List_create();
+    Screen_init(list);
+    
 
     return 0;
 }
