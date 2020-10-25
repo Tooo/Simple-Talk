@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "list.h"
+
 static pthread_t thread;
 static pthread_cond_t screenCondVar = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t screenMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -12,7 +14,6 @@ static List * outputList;
 static char * message = NULL;
 
 void * screenThread(void* unused) {
-    
     while (1) {
         pthread_mutex_lock(&screenMutex);
         {
@@ -20,8 +21,12 @@ void * screenThread(void* unused) {
         }
         pthread_mutex_unlock(&screenMutex);
         message = List_trim(outputList);
+
+        if (strlen(message) == 2 && message[0] == '!') {
+            return NULL;
+        }
+
         puts(message);
-        fflush(stdout);
         free(message);
     }
 

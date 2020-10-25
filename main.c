@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "list.h"
 
@@ -6,6 +7,10 @@
 #include "sender.h"
 #include "receiver.h"
 #include "screen.h"
+
+void freeList(void * item) {
+    free(item);
+}
 
 int main (int arc, char** args) {
 
@@ -21,7 +26,12 @@ int main (int arc, char** args) {
 
     List * list = List_create();
     Screen_init(list);
+    Keyboard_init(list);
     
+    Screen_shutdown();
+    Keyboard_shutdown();
+
+    List_free(list, freeList);
 
     return 0;
 }
