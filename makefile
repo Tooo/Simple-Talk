@@ -1,7 +1,7 @@
 CFLAGS = -Wall -g -std=c99 -D _POSIX_C_SOURCE=200809L -Werror
 
-all: main.o keyboard.o sender.o receiver.o screen.o list.o listmanager.o
-	gcc $(CFLAGS) main.o keyboard.o sender.o receiver.o screen.o list.o listmanager.o -lpthread -o s-talk
+all: main.o keyboard.o sender.o receiver.o screen.o list.o listmanager.o shutdownmanager.o
+	gcc $(CFLAGS) main.o keyboard.o sender.o receiver.o screen.o list.o listmanager.o shutdownmanager.o -lpthread -o s-talk
 
 main.o: main.c
 	gcc $(CFLAGS) -c main.c
@@ -23,6 +23,9 @@ list.o: list.c
 
 listmanager.o: listmanager.c
 	gcc $(CFLAGS) -c listmanager.c
+
+shutdownmanager.o: shutdownmanager.c
+	gcc $(CFLAGS) -c shutdownmanager.c
 
 clean:
 	rm s-talk *.o
