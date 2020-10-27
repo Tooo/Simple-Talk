@@ -1,16 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "list.h"
+#include "shutdownManager.h"
 
 #include "keyboard.h"
 #include "sender.h"
 #include "receiver.h"
 #include "screen.h"
-
-void freeList(void * item) {
-    free(item);
-}
 
 int main (int arc, char** args) {
 
@@ -20,18 +16,16 @@ int main (int arc, char** args) {
         return 1;
     }
 
-    for (int i = 0; i < arc; i++) {
-        printf("%s\n", args[i]);
-    }
+    int inputPort = args[1];
+    char * ipAddress = args[2];
+    int outputPort = args[3];
 
-    List * list = List_create();
-    Screen_init(list);
-    Keyboard_init(list);
+    Keyboard_init();
+    Sender_init(ipAddress, outputPort);
+    Receiver_init(inputPort);
+    Screen_init();
     
-    Screen_shutdown();
-    Keyboard_shutdown();
-
-    List_free(list, freeList);
+    ShutdownManager_waitForShutdown();
 
     return 0;
 }
