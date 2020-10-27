@@ -46,6 +46,7 @@ void* sendThread(void * unused) {
         sendto(socketDescriptor, message, strlen(message), 0, addr->ai_addr, addr->ai_addrlen);
 
         if (strlen(message) == 2 && message[0] == '!') {
+            ShutdownManager_triggerShutdown();
             break;
         }
     }
@@ -72,6 +73,7 @@ void Sender_waitForShutdown() {
 }
 
 void Sender_clean() {
+    pthread_cancel(thread);
     free(message);
     close(socketDescriptor);
 }

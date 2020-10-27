@@ -7,6 +7,7 @@
 #include "sender.h"
 #include "list.h"
 #include "listmanager.h"
+#include "shutdownmanager.h"
 
 static pthread_t thread;
 
@@ -14,7 +15,7 @@ static List * inputList;
 static char * message = NULL;
 
 void * keyboardThread(void* unused) {
-    while (1) {
+    while (!ShutdownManager_isShuttingDown()) {
         message = malloc(MAX_STRING_LEN);
         fgets(message, MAX_STRING_LEN, stdin);
 
@@ -25,6 +26,7 @@ void * keyboardThread(void* unused) {
         Sender_signalNextMessage();
 
         if (strlen(message) == 2 && message[0] == '!') {
+            ShutdownManager_triggerShutdown();
             return NULL;
         }
     }
@@ -42,5 +44,6 @@ void Keyboard_waitForShutdown() {
 }
 
 void Keyboard_clean() {
+    pthread_cancel(thread);
     free(message);
 }

@@ -28,6 +28,7 @@ void * screenThread(void* unused) {
         ListManager_unlockOutputList();
 
         if (strlen(message) == 2 && message[0] == '!') {
+            ShutdownManager_triggerShutdown();
             break;
         }
 
@@ -56,5 +57,6 @@ void Screen_waitForShutdown() {
 }
 
 void Screen_clean() {
+    pthread_cancel(thread);
     free(message);
 }
