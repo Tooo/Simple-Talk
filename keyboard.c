@@ -1,11 +1,12 @@
-#include "keyboard.h"
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
+#include "keyboard.h"
 #include "screen.h"
-#define BUFFER 128
+#include "list.h"
+#include "listmanager.h"
 
 static pthread_t thread;
 
@@ -14,8 +15,8 @@ static char * message = NULL;
 
 void * keyboardThread(void* unused) {
     while (1) {
-        message = malloc(BUFFER);
-        fgets(message, BUFFER, stdin);
+        message = malloc(MAX_STRING_LEN);
+        fgets(message, MAX_STRING_LEN, stdin);
 
         List_prepend(inputList, message);
         Screen_signalNextMessage();

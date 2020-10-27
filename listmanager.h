@@ -3,6 +3,8 @@
 
 #include "list.h"
 
+#define MAX_STRING_LEN 128
+
 // Create input and output Lists
 int ListManager_create();
 

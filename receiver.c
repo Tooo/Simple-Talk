@@ -9,11 +9,14 @@
 #include "receiver.h"
 #include "list.h"
 #include "listmanager.h"
+#include "shutdownManager.h"
 
 static pthread_t thread;
 
 static int port;
 static int socketDescriptor;
+
+static char * message = NULL;
 static List * outputList;
 
 void* receiveThread(void * unused) {
@@ -35,29 +38,39 @@ void* receiveThread(void * unused) {
 
     // CHECK RETURN VALUES
 
-    while (1) {
-        struct sockaddr_in sinRemote;
-        unsigned int sin_len = sizeof(sinRemote);
-        char messageRx[MAX_LEN]; // Buffer Rx
-        recvfrom(socketDescriptor, messageRx, MAX_LEN, 0, (struct sockaddr *) &sinRemote, &sin_len);
+    struct sockaddr_in sinRemote;
+    unsigned int sin_len = sizeof(sinRemote);
 
+    while (!ShutdownManager_isShuttingDown) {
+        
+        message = malloc(MAX_STRING_LEN);
+
+        recvfrom(socketDescriptor, message, MAX_STRING_LEN, 0, (struct sockaddr *) &sinRemote, &sin_len);
+
+        ListManager_lockOutputList();
+        List_prepend(outputList, message);
+        ListManager_unlockOutputList();
+
+        Screen_signalNextMessage();
+
+        if (strlen(message) == 2 && message[0] == '!') {
+            break;
+        }
     }
-    
-    // Close socket
-    close(socketDescriptor);
     return NULL;
 }
 
 void Receiver_init(int portInput) {
+    outputList = ListManager_getOutputList();
     port = portInput;
     pthread_create(&thread, NULL, receiveThread, NULL);
 }
 
-void Receiver_waitForShutdown(void) {
+void Receiver_waitForShutdown() {
     pthread_join(thread, NULL);
 }
 
-void Reciever_clean(void) {
+void Reciever_clean() {
+    free(message);
     close(socketDescriptor);
-
 }
