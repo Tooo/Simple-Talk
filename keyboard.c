@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "keyboard.h"
-#include "screen.h"
+#include "sender.h"
 #include "list.h"
 #include "listmanager.h"
 
@@ -33,7 +33,7 @@ void * keyboardThread(void* unused) {
 }
 
 void Keyboard_init() {
-    inputList = ListManager_getInputList;
+    inputList = ListManager_getInputList();
     pthread_create(&thread, NULL, keyboardThread, NULL);
 }
 

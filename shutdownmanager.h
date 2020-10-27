@@ -1,6 +1,8 @@
 #ifndef _SHUTDOWNMANAGER_H_
 #define _SHUTDOWNMANAGER_H_
 
+#include <stdbool.h>
+
 // Block current thread until some other thread calls triggerShutdown() method
 void ShutdownManager_waitForShutdown();
 

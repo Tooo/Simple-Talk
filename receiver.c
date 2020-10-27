@@ -7,9 +7,10 @@
 #include <unistd.h>  // close()
 
 #include "receiver.h"
+#include "screen.h"
 #include "list.h"
 #include "listmanager.h"
-#include "shutdownManager.h"
+#include "shutdownmanager.h"
 
 static pthread_t thread;
 
@@ -38,11 +39,10 @@ void* receiveThread(void * unused) {
 
     // CHECK RETURN VALUES
 
-    struct sockaddr_in sinRemote;
-    unsigned int sin_len = sizeof(sinRemote);
+    while (!ShutdownManager_isShuttingDown()) {
+        struct sockaddr_in sinRemote;
+        unsigned int sin_len = sizeof(sinRemote);
 
-    while (!ShutdownManager_isShuttingDown) {
-        
         message = malloc(MAX_STRING_LEN);
 
         recvfrom(socketDescriptor, message, MAX_STRING_LEN, 0, (struct sockaddr *) &sinRemote, &sin_len);

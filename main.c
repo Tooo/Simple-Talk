@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "shutdownManager.h"
+#include "shutdownmanager.h"
 
 #include "keyboard.h"
 #include "sender.h"
@@ -16,9 +16,9 @@ int main (int arc, char** args) {
         return 1;
     }
 
-    int inputPort = args[1];
+    int inputPort = atoi(args[1]);
     char * ipAddress = args[2];
-    int outputPort = args[3];
+    char * outputPort = args[3];
 
     Keyboard_init();
     Sender_init(ipAddress, outputPort);

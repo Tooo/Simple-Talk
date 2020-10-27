@@ -1,11 +1,12 @@
-#include "screen.h"
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
+#include "screen.h"
 #include "list.h"
 #include "listmanager.h"
+#include "shutdownmanager.h"
 
 static pthread_t thread;
 static pthread_cond_t screenCondVar = PTHREAD_COND_INITIALIZER;
@@ -15,7 +16,7 @@ static List * outputList;
 static char * message = NULL;
 
 void * screenThread(void* unused) {
-    while (1) {
+    while (!ShutdownManager_isShuttingDown()) {
         pthread_mutex_lock(&screenMutex);
         {
             pthread_cond_wait(&screenCondVar, &screenMutex);
@@ -46,7 +47,7 @@ void Screen_signalNextMessage() {
 }
 
 void Screen_init() {
-    outputList = ListManager_getOutputList;
+    outputList = ListManager_getOutputList();
     pthread_create(&thread, NULL, screenThread, NULL);
 }
 

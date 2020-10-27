@@ -9,14 +9,16 @@ static bool isShutingDown = false;
 
 // Block current thread until some other thread calls triggerShutdown() method
 void ShutdownManager_waitForShutdown() {
-
+    Keyboard_waitForShutdown();
+    Sender_waitForShutdown();
+    Receiver_waitForShutdown();
+    Screen_waitForShutdown();
 }
 
 // Indicate that we should shutdown, and allowing all threads which
 // blocked on waitForShutdown() function to continue
 void ShutdownManager_triggerShutdown() {
-    Screen_shutdown();
-    Keyboard_shutdown();
+    isShutingDown = true;
 }
 
 bool ShutdownManager_isShuttingDown() {

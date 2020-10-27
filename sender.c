@@ -9,13 +9,13 @@
 #include "receiver.h"
 #include "list.h"
 #include "listmanager.h"
-#include "shutdownManager.h"
+#include "shutdownmanager.h"
 
 static pthread_t thread;
 static pthread_cond_t senderCondVar = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t senderMutex = PTHREAD_MUTEX_INITIALIZER;
 
-static int port;
+static char * port;
 static char * ip;
 static int socketDescriptor;
 
@@ -23,28 +23,16 @@ static char * message = NULL;
 static List * inputList;
 
 void* sendThread(void * unused) {
-
-    //Address
-    struct sockaddr_in sin;
-    memset(&sin, 0, sizeof(sin));
-    sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = ip;
-    sin.sin_port = htons(port);
+    struct addrinfo * addr = NULL;
+    getaddrinfo(ip, port, 0, &addr);
 
     // Create socket for UDP
-    socketDescriptor = socket(PF_INET, SOCK_DGRAM, 0);
-
-    // CHECK ERRORS
-
-    // Bind socket to the port we specified
-    bind (socketDescriptor, (struct sockaddr*) &sin, sizeof(sin));
+    socketDescriptor = socket(addr->ai_family, addr->ai_socktype, 0);
 
     // CHECK RETURN VALUES
 
-    struct sockaddr_in sinRemote;
-    unsigned int sin_len = sizeof(sinRemote);
-
-    while (!ShutdownManager_isShuttingDown) {
+    while (!ShutdownManager_isShuttingDown()) {
+        
         pthread_mutex_lock(&senderMutex);
         {
             pthread_cond_wait(&senderCondVar, &senderMutex);
@@ -55,7 +43,7 @@ void* sendThread(void * unused) {
         message = List_trim(inputList);
         ListManager_lockInputList();
         
-        sendto(socketDescriptor, message, strlen(message), 0, (struct sockaddr *) &sinRemote, sin_len);
+        sendto(socketDescriptor, message, strlen(message), 0, addr->ai_addr, addr->ai_addrlen);
 
         if (strlen(message) == 2 && message[0] == '!') {
             break;
@@ -72,7 +60,7 @@ void Sender_signalNextMessage() {
     pthread_mutex_unlock(&senderMutex);
 }
 
-void Sender_init(char * ipAddress, int portOutput) {
+void Sender_init(char * ipAddress, char * portOutput) {
     inputList = ListManager_getInputList();
     ip = ipAddress;
     port = portOutput;
