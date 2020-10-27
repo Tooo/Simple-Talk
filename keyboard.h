@@ -3,7 +3,8 @@
 
 #include "list.h"
 
-void Keyboard_init(List * list);
-void Keyboard_shutdown();
+void Keyboard_init();
+void Keyboard_waitForShutdown();
+void Keyboard_clean();
 
 #endif

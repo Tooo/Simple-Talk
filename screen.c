@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "list.h"
+#include "listmanager.h"
 
 static pthread_t thread;
 static pthread_cond_t screenCondVar = PTHREAD_COND_INITIALIZER;
@@ -20,10 +21,13 @@ void * screenThread(void* unused) {
             pthread_cond_wait(&screenCondVar, &screenMutex);
         }
         pthread_mutex_unlock(&screenMutex);
+
+        ListManager_lockOutputList();
         message = List_trim(outputList);
+        ListManager_unlockOutputList();
 
         if (strlen(message) == 2 && message[0] == '!') {
-            return NULL;
+            break;
         }
 
         puts(message);
@@ -41,12 +45,15 @@ void Screen_signalNextMessage() {
     pthread_mutex_unlock(&screenMutex);
 }
 
-void Screen_init(List * list) {
-    outputList = list;
+void Screen_init() {
+    outputList = ListManager_getOutputList;
     pthread_create(&thread, NULL, screenThread, NULL);
 }
 
-void Screen_shutdown() {
-    free(message);
+void Screen_waitForShutdown() {
     pthread_join(thread, NULL);
+}
+
+void Screen_clean() {
+    free(message);
 }

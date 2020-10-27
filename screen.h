@@ -4,7 +4,8 @@
 #include "list.h"
 
 void Screen_signalNextMessage();
-void Screen_init(List * list);
-void Screen_shutdown();
+void Screen_init();
+void Screen_waitForShutdown();
+void Screen_clean();
 
 #endif

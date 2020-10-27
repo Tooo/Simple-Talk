@@ -12,7 +12,7 @@ int main (int arc, char** args) {
 
     if (arc != 4) {
         printf("Invalid Arguments\n");
-        printf("Sample: s-talk 9001 csil-cpu6.csil.sfuca 8989\n");
+        printf("Sample: s-talk 9001 csil-cpu6.csil.sfu.ca 8989\n");
         return 1;
     }
 

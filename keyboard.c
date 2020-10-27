@@ -18,8 +18,11 @@ void * keyboardThread(void* unused) {
         message = malloc(MAX_STRING_LEN);
         fgets(message, MAX_STRING_LEN, stdin);
 
+        ListManager_lockInputList();
         List_prepend(inputList, message);
-        Screen_signalNextMessage();
+        ListManager_unlockInputList();
+
+        Sender_signalNextMessage();
 
         if (strlen(message) == 2 && message[0] == '!') {
             return NULL;
@@ -29,12 +32,15 @@ void * keyboardThread(void* unused) {
     return NULL;
 }
 
-void Keyboard_init(List * list) {
-    inputList = list;
+void Keyboard_init() {
+    inputList = ListManager_getInputList;
     pthread_create(&thread, NULL, keyboardThread, NULL);
 }
 
-void Keyboard_shutdown() {
-    free(message);
+void Keyboard_waitForShutdown() {
     pthread_join(thread, NULL);
+}
+
+void Keyboard_clean() {
+    free(message);
 }
