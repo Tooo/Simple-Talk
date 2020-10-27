@@ -27,6 +27,7 @@ int main (int arc, char** args) {
     Sender_init(ipAddress, outputPort);
     Receiver_init(inputPort);
     Screen_init();
+    ShutdownManager_init();
     
     ShutdownManager_waitForShutdown();
 

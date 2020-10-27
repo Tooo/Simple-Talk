@@ -18,37 +18,57 @@ static pthread_mutex_t senderMutex = PTHREAD_MUTEX_INITIALIZER;
 static char * port;
 static char * ip;
 static int socketDescriptor;
+static struct addrinfo * addr = NULL;
 
 static char * message = NULL;
 static List * inputList;
 
 void* sendThread(void * unused) {
-    struct addrinfo * addr = NULL;
-    getaddrinfo(ip, port, 0, &addr);
+    
+    static struct addrinfo hints;
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
 
-    // Create socket for UDP
-    socketDescriptor = socket(addr->ai_family, addr->ai_socktype, 0);
+    if (getaddrinfo(ip, port, 0, &addr)) {
+        puts("Sender: Failed to getAddrInfo");
+        ShutdownManager_triggerShutdown();
+        return NULL;
+    }
+
+    for (struct addrinfo * i = addr; i != NULL; i = i->ai_next) {
+        if ((socketDescriptor = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol)) != -1) {
+            break;
+        }
+    }
+    
+    if (!socketDescriptor) {
+        puts("Sender: Failed to connect to socket");
+        ShutdownManager_triggerShutdown();
+        return NULL;
+    }
 
     // CHECK RETURN VALUES
 
     while (!ShutdownManager_isShuttingDown()) {
-        
+        puts("In sender loop");
         pthread_mutex_lock(&senderMutex);
         {
             pthread_cond_wait(&senderCondVar, &senderMutex);
         }
         pthread_mutex_unlock(&senderMutex);
 
-        ListManager_lockInputList();
-        message = List_trim(inputList);
-        ListManager_lockInputList();
-        
-        sendto(socketDescriptor, message, strlen(message), 0, addr->ai_addr, addr->ai_addrlen);
-
-        if (strlen(message) == 2 && message[0] == '!') {
-            ShutdownManager_triggerShutdown();
+        if (ShutdownManager_isShuttingDown()) {
             break;
         }
+
+        ListManager_lockInputList();
+        message = List_trim(inputList);
+        ListManager_unlockInputList();
+
+        sendto(socketDescriptor, message, strlen(message), 0, addr->ai_addr, addr->ai_addrlen);
+        
+        free(message);
     }
     return NULL;
 }
@@ -74,6 +94,12 @@ void Sender_waitForShutdown() {
 
 void Sender_clean() {
     pthread_cancel(thread);
-    free(message);
+    if (!message) {
+        free(message);
+    }
+
+    if (!addr) {
+        free(addr);
+    }
     close(socketDescriptor);
 }

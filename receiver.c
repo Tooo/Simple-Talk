@@ -32,7 +32,11 @@ void* receiveThread(void * unused) {
     // Create socket for UDP
     socketDescriptor = socket(PF_INET, SOCK_DGRAM, 0);
 
-    // CHECK ERRORS
+    if (!socketDescriptor) {
+        puts("Reciever: Failed to connect to socket");
+        ShutdownManager_triggerShutdown();
+        return NULL;
+    }
 
     // Bind socket to the port we specified
     bind (socketDescriptor, (struct sockaddr*) &sin, sizeof(sin));
@@ -40,6 +44,7 @@ void* receiveThread(void * unused) {
     // CHECK RETURN VALUES
 
     while (!ShutdownManager_isShuttingDown()) {
+        puts("In receiever loop");
         struct sockaddr_in sinRemote;
         unsigned int sin_len = sizeof(sinRemote);
 
@@ -73,6 +78,8 @@ void Receiver_waitForShutdown() {
 
 void Reciever_clean() {
     pthread_cancel(thread);
-    free(message);
+    if (!message) {
+        free(message);
+    }
     close(socketDescriptor);
 }

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <pthread.h>
 
 #include "keyboard.h"
@@ -11,13 +12,12 @@ static pthread_t thread;
 static pthread_cond_t shutdownCondVar = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t shutdownMutex = PTHREAD_MUTEX_INITIALIZER;
 
-
 static bool isShutingDown = false;
 
 void * shutdownThread(void * unused) {
     pthread_mutex_lock(&shutdownMutex);
     {
-            pthread_cond_wait(&shutdownCondVar, &shutdownMutex);
+        pthread_cond_wait(&shutdownCondVar, &shutdownMutex);
     }
     pthread_mutex_unlock(&shutdownMutex);
 
@@ -30,7 +30,7 @@ void * shutdownThread(void * unused) {
     return NULL;
 }
 
-void waitForShutdown() {
+void ShutdownManager_init() {
     pthread_create(&thread, NULL, shutdownThread, NULL);
 }
 
@@ -40,7 +40,7 @@ void ShutdownManager_waitForShutdown() {
     Sender_waitForShutdown();
     Receiver_waitForShutdown();
     Screen_waitForShutdown();
-    waitForShutdown();
+    pthread_join(thread, NULL);
 }
 
 // Indicate that we should shutdown, and allowing all threads which

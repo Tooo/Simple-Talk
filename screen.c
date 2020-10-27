@@ -17,20 +17,20 @@ static char * message = NULL;
 
 void * screenThread(void* unused) {
     while (!ShutdownManager_isShuttingDown()) {
+        puts("In screen loop");
         pthread_mutex_lock(&screenMutex);
         {
             pthread_cond_wait(&screenCondVar, &screenMutex);
         }
         pthread_mutex_unlock(&screenMutex);
 
+        if (ShutdownManager_isShuttingDown()) {
+            break;
+        }
+
         ListManager_lockOutputList();
         message = List_trim(outputList);
         ListManager_unlockOutputList();
-
-        if (strlen(message) == 2 && message[0] == '!') {
-            ShutdownManager_triggerShutdown();
-            break;
-        }
 
         puts(message);
         free(message);
@@ -58,5 +58,7 @@ void Screen_waitForShutdown() {
 
 void Screen_clean() {
     pthread_cancel(thread);
-    free(message);
+    if (!message) {
+        free(message);
+    }
 }

@@ -16,6 +16,7 @@ static char * message = NULL;
 
 void * keyboardThread(void* unused) {
     while (!ShutdownManager_isShuttingDown()) {
+        puts("In keyboard loop");
         message = malloc(MAX_STRING_LEN);
         fgets(message, MAX_STRING_LEN, stdin);
 
@@ -25,7 +26,7 @@ void * keyboardThread(void* unused) {
 
         Sender_signalNextMessage();
 
-        if (strlen(message) == 2 && message[0] == '!') {
+        if (strlen(message) == 2 && message[0] == '!') {     
             ShutdownManager_triggerShutdown();
             return NULL;
         }
@@ -45,5 +46,7 @@ void Keyboard_waitForShutdown() {
 
 void Keyboard_clean() {
     pthread_cancel(thread);
-    free(message);
+    if (!message) {
+        free(message);
+    }
 }

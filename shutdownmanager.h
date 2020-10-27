@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 
+void ShutdownManager_init();
+
 // Block current thread until some other thread calls triggerShutdown() method
 void ShutdownManager_waitForShutdown();
 
