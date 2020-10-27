@@ -17,7 +17,6 @@ static char * message = NULL;
 
 void * screenThread(void* unused) {
     while (!ShutdownManager_isShuttingDown()) {
-        puts("In screen loop");
         pthread_mutex_lock(&screenMutex);
         {
             pthread_cond_wait(&screenCondVar, &screenMutex);
@@ -31,7 +30,7 @@ void * screenThread(void* unused) {
         ListManager_lockOutputList();
         message = List_trim(outputList);
         ListManager_unlockOutputList();
-
+        fputs("Receiver: ", stdout);
         puts(message);
         free(message);
     }

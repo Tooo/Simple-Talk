@@ -18,7 +18,7 @@ static pthread_mutex_t senderMutex = PTHREAD_MUTEX_INITIALIZER;
 static char * port;
 static char * ip;
 static int socketDescriptor;
-static struct addrinfo * addr = NULL;
+static struct addrinfo * addr;
 
 static char * message = NULL;
 static List * inputList;
@@ -30,44 +30,47 @@ void* sendThread(void * unused) {
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_DGRAM;
 
-    if (getaddrinfo(ip, port, 0, &addr)) {
+    if (getaddrinfo(ip, port, &hints, &addr) !=0) {
         puts("Sender: Failed to getAddrInfo");
         ShutdownManager_triggerShutdown();
         return NULL;
     }
 
     for (struct addrinfo * i = addr; i != NULL; i = i->ai_next) {
-        if ((socketDescriptor = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol)) != -1) {
-            break;
+        if ((socketDescriptor = socket(i->ai_family, i->ai_socktype, i->ai_protocol)) == -1) {
+            continue;
         }
+        break;
     }
     
-    if (!socketDescriptor) {
+    if (socketDescriptor == -1 || addr == NULL) {
         puts("Sender: Failed to connect to socket");
         ShutdownManager_triggerShutdown();
         return NULL;
     }
 
-    // CHECK RETURN VALUES
-
     while (!ShutdownManager_isShuttingDown()) {
-        puts("In sender loop");
         pthread_mutex_lock(&senderMutex);
         {
             pthread_cond_wait(&senderCondVar, &senderMutex);
         }
         pthread_mutex_unlock(&senderMutex);
 
-        if (ShutdownManager_isShuttingDown()) {
-            break;
-        }
-
         ListManager_lockInputList();
         message = List_trim(inputList);
         ListManager_unlockInputList();
 
-        sendto(socketDescriptor, message, strlen(message), 0, addr->ai_addr, addr->ai_addrlen);
+        if (sendto(socketDescriptor, message, strlen(message), 0, addr->ai_addr, addr->ai_addrlen) == -1) {
+            puts("Sender: Failed to send");
+            ShutdownManager_triggerShutdown();
+            return NULL;
+        }
         
+        if (strlen(message) == 2 && message[0] == '!') {     
+            ShutdownManager_triggerShutdown();
+            return NULL;
+        }
+
         free(message);
     }
     return NULL;
@@ -99,7 +102,7 @@ void Sender_clean() {
     }
 
     if (!addr) {
-        free(addr);
+        freeaddrinfo(addr);
     }
     close(socketDescriptor);
 }

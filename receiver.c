@@ -32,26 +32,33 @@ void* receiveThread(void * unused) {
     // Create socket for UDP
     socketDescriptor = socket(PF_INET, SOCK_DGRAM, 0);
 
-    if (!socketDescriptor) {
-        puts("Reciever: Failed to connect to socket");
+    if (socketDescriptor == -1) {
+        puts("Receiver: Failed to connect to socket");
         ShutdownManager_triggerShutdown();
         return NULL;
     }
 
     // Bind socket to the port we specified
-    bind (socketDescriptor, (struct sockaddr*) &sin, sizeof(sin));
+
+    if (bind (socketDescriptor, (struct sockaddr*) &sin, sizeof(sin)) == -1) {
+        puts("Receiver: Failed to bind");
+        ShutdownManager_triggerShutdown();
+        return NULL;
+    }
 
     // CHECK RETURN VALUES
 
     while (!ShutdownManager_isShuttingDown()) {
-        puts("In receiever loop");
         struct sockaddr_in sinRemote;
         unsigned int sin_len = sizeof(sinRemote);
 
         message = malloc(MAX_STRING_LEN);
 
-        recvfrom(socketDescriptor, message, MAX_STRING_LEN, 0, (struct sockaddr *) &sinRemote, &sin_len);
-
+        if (recvfrom(socketDescriptor, message, MAX_STRING_LEN, 0, (struct sockaddr *) &sinRemote, &sin_len) == -1) {
+            puts("Receiver: Failed to recvfrom");
+            ShutdownManager_triggerShutdown();
+            return NULL;
+        }
         ListManager_lockOutputList();
         List_prepend(outputList, message);
         ListManager_unlockOutputList();
