@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "listmanager.h"
 #include "shutdownmanager.h"
@@ -12,8 +13,8 @@
 int main (int arc, char** args) {
 
     if (arc != 4) {
-        printf("Invalid Arguments\n");
-        printf("Sample: s-talk 9001 csil-cpu6.csil.sfu.ca 8989\n");
+        puts("Invalid Arguments\n");
+        puts("Sample: s-talk 9001 csil-cpu6.csil.sfu.ca 8989\n");
         return 1;
     }
 
