@@ -8,6 +8,13 @@
 #include "screen.h"
 #include "listmanager.h"
 
+/*
+    Shutdown Manager Thread
+    Locked when messaging system is active
+    Starts when triggerShutdown is called
+    (Refer to Brian Fraser Shutdown of Threads workshop)
+*/
+
 static pthread_t thread;
 static pthread_cond_t shutdownCondVar = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t shutdownMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -34,7 +41,6 @@ void ShutdownManager_init() {
     pthread_create(&thread, NULL, shutdownThread, NULL);
 }
 
-// Block current thread until some other thread calls triggerShutdown() method
 void ShutdownManager_waitForShutdown() {
     Keyboard_waitForShutdown();
     Sender_waitForShutdown();
@@ -43,8 +49,6 @@ void ShutdownManager_waitForShutdown() {
     pthread_join(thread, NULL);
 }
 
-// Indicate that we should shutdown, and allowing all threads which
-// blocked on waitForShutdown() function to continue
 void ShutdownManager_triggerShutdown() {
     isShutingDown = true;
     pthread_mutex_lock(&shutdownMutex);
