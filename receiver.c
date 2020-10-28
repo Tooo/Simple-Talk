@@ -1,16 +1,22 @@
-#include <stdio.h>
-#include <string.h>
 #include <pthread.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <netdb.h>
-#include <string.h> // strncmp()
-#include <unistd.h>  // close()
+#include <unistd.h>
 
 #include "receiver.h"
 #include "screen.h"
 #include "list.h"
 #include "listmanager.h"
 #include "shutdownmanager.h"
+
+/*
+    Receiever thread
+    Receieve messages from remote computer
+    Sends to screen thread
+    (Refer to Brian Fraser Sockets, Threads workshop)
+*/
 
 static pthread_t thread;
 
@@ -22,14 +28,12 @@ static List * outputList;
 
 void* receiveThread(void * unused) {
 
-    //Address
     struct sockaddr_in sin;
     memset(&sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = htonl(INADDR_ANY);
     sin.sin_port = htons(port);
 
-    // Create socket for UDP
     socketDescriptor = socket(PF_INET, SOCK_DGRAM, 0);
 
     if (socketDescriptor == -1) {
@@ -38,20 +42,16 @@ void* receiveThread(void * unused) {
         return NULL;
     }
 
-    // Bind socket to the port we specified
-
     if (bind (socketDescriptor, (struct sockaddr*) &sin, sizeof(sin)) == -1) {
         puts("Receiver: Failed to bind");
         ShutdownManager_triggerShutdown();
         return NULL;
     }
 
-    // CHECK RETURN VALUES
+    struct sockaddr_in sinRemote;
+    unsigned int sin_len = sizeof(sinRemote);
 
     while (!ShutdownManager_isShuttingDown()) {
-        struct sockaddr_in sinRemote;
-        unsigned int sin_len = sizeof(sinRemote);
-
         message = malloc(MAX_STRING_LEN);
 
         if (recvfrom(socketDescriptor, message, MAX_STRING_LEN, 0, (struct sockaddr *) &sinRemote, &sin_len) == -1) {
@@ -59,8 +59,11 @@ void* receiveThread(void * unused) {
             ShutdownManager_triggerShutdown();
             return NULL;
         }
+
         ListManager_lockOutputList();
-        List_prepend(outputList, message);
+        if (List_prepend(outputList, message) == -1) {
+            puts("Receiver: Fail to prepend message");
+        }
         ListManager_unlockOutputList();
 
         Screen_signalNextMessage();
