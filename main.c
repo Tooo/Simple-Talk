@@ -3,17 +3,16 @@
 
 #include "listmanager.h"
 #include "shutdownmanager.h"
+#include "keyboard.h"
+#include "sender.h"
+#include "receiver.h"
+#include "screen.h"
 
 /*
     Main Thread
     Simple-talk chat with connecting remote server and ports
     4 threads to handle keyboard inputs, sender, receiever, and screen output
 */
-
-#include "keyboard.h"
-#include "sender.h"
-#include "receiver.h"
-#include "screen.h"
 
 int main (int arc, char** args) {
 
