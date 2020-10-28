@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "screen.h"
 #include "list.h"
@@ -42,8 +43,17 @@ void * screenThread(void* unused) {
         }
 
         fputs("Receiver: ", stdout);
-        puts(message);
-        free(message);
+        fputs(message, stdout);
+
+        if (strlen(message) == 2 && message[0] == '!') {
+            ShutdownManager_triggerShutdown();
+            break;
+        }
+
+        if (message != NULL) {
+            free(message);
+            message = NULL;
+        }
     }
 
     return NULL;
@@ -71,7 +81,7 @@ void Screen_clean() {
     pthread_mutex_destroy(&screenMutex);
     pthread_cond_destroy(&screenCondVar);
 
-    if (message) {
+    if (message != NULL) {
         free(message);
     }
 }

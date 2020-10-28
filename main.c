@@ -14,7 +14,7 @@ int main (int arc, char** args) {
 
     if (arc != 4) {
         puts("Invalid Arguments\n");
-        puts("Sample: s-talk 9001 csil-cpu6.csil.sfu.ca 8989\n");
+        puts("Sample: s-talk 9001 csil-cpu6 8989\n");
         return 1;
     }
 

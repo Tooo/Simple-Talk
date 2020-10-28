@@ -67,11 +67,6 @@ void* receiveThread(void * unused) {
         ListManager_unlockOutputList();
 
         Screen_signalNextMessage();
-
-        if (strlen(message) == 2 && message[0] == '!') {
-            ShutdownManager_triggerShutdown();
-            break;
-        }
     }
     return NULL;
 }
@@ -88,7 +83,7 @@ void Receiver_waitForShutdown() {
 
 void Reciever_clean() {
     pthread_cancel(thread);
-    if (message) {
+    if (message != NULL) {
         free(message);
     }
     close(socketDescriptor);

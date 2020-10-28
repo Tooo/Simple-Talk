@@ -81,7 +81,10 @@ void* sendThread(void * unused) {
             return NULL;
         }
 
-        free(message);
+        if (message != NULL) {
+            free(message);
+            message = NULL;
+        }
     }
     return NULL;
 }
@@ -110,7 +113,7 @@ void Sender_clean() {
     pthread_mutex_destroy(&senderMutex);
     pthread_cond_destroy(&senderCondVar);
 
-    if (message) {
+    if (message != NULL) {
         free(message);
     }
 
