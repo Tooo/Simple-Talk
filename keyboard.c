@@ -1,13 +1,19 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 #include "keyboard.h"
 #include "sender.h"
 #include "list.h"
 #include "listmanager.h"
 #include "shutdownmanager.h"
+
+/*
+    Keyboard thread
+    Receieve input from local computer
+    Sends to sender thread
+    (Refer to Brian Fraser Threads video)
+*/
 
 static pthread_t thread;
 
@@ -17,10 +23,20 @@ static char * message = NULL;
 void * keyboardThread(void* unused) {
     while (!ShutdownManager_isShuttingDown()) {
         message = malloc(MAX_STRING_LEN);
+
+        if (message == NULL) {
+            puts("Keyboard: Fail to malloc message");
+            ShutdownManager_triggerShutdown();
+            break;
+        }
+
         fgets(message, MAX_STRING_LEN, stdin);
 
         ListManager_lockInputList();
-        List_prepend(inputList, message);
+        if (List_prepend(inputList, message) == -1) {
+            puts("Keyboard: Fail to prepend to list");
+        }
+        
         ListManager_unlockInputList();
 
         Sender_signalNextMessage();
