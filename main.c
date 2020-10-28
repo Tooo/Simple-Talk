@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 
 #include "listmanager.h"
 #include "shutdownmanager.h"
+
+/*
+    Main Thread
+    Simple-talk chat with connecting remote server and ports
+    4 threads to handle keyboard inputs, sender, receiever, and screen output
+*/
 
 #include "keyboard.h"
 #include "sender.h"
