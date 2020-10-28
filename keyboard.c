@@ -12,7 +12,7 @@
     Keyboard thread
     Receieve input from local computer
     Sends to sender thread
-    (Refer to Brian Fraser Threads video)
+    (Refer to Brian Fraser Threads workshop)
 */
 
 static pthread_t thread;

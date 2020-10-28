@@ -1,12 +1,18 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 #include "screen.h"
 #include "list.h"
 #include "listmanager.h"
 #include "shutdownmanager.h"
+
+/*
+    Screen thread
+    Receieve messages from receiver
+    Prints messages
+    (Refer to Brian Fraser Threads, Condition Variables workshop)
+*/
 
 static pthread_t thread;
 static pthread_cond_t screenCondVar = PTHREAD_COND_INITIALIZER;
@@ -30,6 +36,11 @@ void * screenThread(void* unused) {
         ListManager_lockOutputList();
         message = List_trim(outputList);
         ListManager_unlockOutputList();
+
+        if (message == NULL) {
+            puts("Screen: message is NULL");
+        }
+
         fputs("Receiver: ", stdout);
         puts(message);
         free(message);
