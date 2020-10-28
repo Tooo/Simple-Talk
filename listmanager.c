@@ -3,6 +3,12 @@
 
 #include "list.h"
 
+/*
+    ListManager
+    Create and free inputList and outputList
+    Mutexes to lock and unlock list
+*/
+
 static pthread_mutex_t inputMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t outputMutex = PTHREAD_MUTEX_INITIALIZER;
 
