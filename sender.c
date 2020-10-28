@@ -1,15 +1,22 @@
+#include <pthread.h>
 #include <stdio.h>
 #include <string.h>
-#include <pthread.h>
 #include <stdlib.h>
 #include <netdb.h>
-#include <string.h> // strncmp()
-#include <unistd.h>  // close()
+#include <unistd.h>
 
-#include "receiver.h"
+#include "sender.h"
 #include "list.h"
 #include "listmanager.h"
 #include "shutdownmanager.h"
+
+/*
+    Sender thread
+    Receive messages from keyboard thread
+    Sends to remote computer
+    (Refer to Brian Fraser Threads, Condition Variables workshop)
+    (Also refer to Beej's Guide to Network Programming)
+*/
 
 static pthread_t thread;
 static pthread_cond_t senderCondVar = PTHREAD_COND_INITIALIZER;
@@ -24,7 +31,6 @@ static char * message = NULL;
 static List * inputList;
 
 void* sendThread(void * unused) {
-    
     static struct addrinfo hints;
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
@@ -59,6 +65,10 @@ void* sendThread(void * unused) {
         ListManager_lockInputList();
         message = List_trim(inputList);
         ListManager_unlockInputList();
+
+        if (message == NULL) {
+            puts("Sender: message is NULL");
+        }
 
         if (sendto(socketDescriptor, message, strlen(message), 0, addr->ai_addr, addr->ai_addrlen) == -1) {
             puts("Sender: Failed to send");
