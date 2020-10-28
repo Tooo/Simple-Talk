@@ -85,7 +85,7 @@ void Receiver_waitForShutdown() {
 
 void Reciever_clean() {
     pthread_cancel(thread);
-    if (!message) {
+    if (message) {
         free(message);
     }
     close(socketDescriptor);

@@ -32,15 +32,20 @@ void freeItem(void * item) {
 void ListManager_free() {
     List_free(inputList, freeItem);
     List_free(outputList, freeItem);
+    pthread_mutex_destroy(&inputMutex);
+    pthread_mutex_destroy(&outputMutex);
 }
 
+// Get input and output Lists
 List * ListManager_getInputList() {
     return inputList;
 }
+
 List * ListManager_getOutputList() {
     return outputList;
 }
 
+// Lock and unlock inputList
 void ListManager_lockInputList() {
     pthread_mutex_lock(&inputMutex);
 }
@@ -49,6 +54,7 @@ void ListManager_unlockInputList() {
     pthread_mutex_unlock(&inputMutex);
 }
 
+// Lock and unlock outputList
 void ListManager_lockOutputList() {
     pthread_mutex_lock(&outputMutex);
 }

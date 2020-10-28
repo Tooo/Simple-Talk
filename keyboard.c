@@ -40,7 +40,7 @@ void Keyboard_waitForShutdown() {
 
 void Keyboard_clean() {
     pthread_cancel(thread);
-    if (!message) {
+    if (message) {
         free(message);
     }
 }

@@ -57,7 +57,10 @@ void Screen_waitForShutdown() {
 
 void Screen_clean() {
     pthread_cancel(thread);
-    if (!message) {
+    pthread_mutex_destroy(&screenMutex);
+    pthread_cond_destroy(&screenCondVar);
+
+    if (message) {
         free(message);
     }
 }

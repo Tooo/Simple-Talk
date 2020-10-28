@@ -97,11 +97,14 @@ void Sender_waitForShutdown() {
 
 void Sender_clean() {
     pthread_cancel(thread);
-    if (!message) {
+    pthread_mutex_destroy(&senderMutex);
+    pthread_cond_destroy(&senderCondVar);
+
+    if (message) {
         free(message);
     }
 
-    if (!addr) {
+    if (addr) {
         freeaddrinfo(addr);
     }
     close(socketDescriptor);
