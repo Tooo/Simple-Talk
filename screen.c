@@ -12,7 +12,6 @@
     Screen thread
     Receieve messages from receiver
     Prints messages
-    (Refer to Brian Fraser Threads, Condition Variables workshop)
 */
 
 static pthread_t thread;

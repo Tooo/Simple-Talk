@@ -1,6 +1,4 @@
 // List data type
-// You may modify this file as needed; however,
-// you may *NOT* modify the function prototypes or constant names.
 
 #ifndef _LIST_H_
 #define _LIST_H_
@@ -30,17 +28,10 @@ struct List_s{
     int count;
 };
 // Maximum number of unique lists the system can support
-// (You may modify for your needs)
 #define LIST_MAX_NUM_HEADS 2
 
 // Maximum total number of nodes (statically allocated) to be shared across all lists
-// (You may modify for your needs)
 #define LIST_MAX_NUM_NODES 512
-
-// General Error Handling:
-// Client code is assumed never to call these functions with a NULL List pointer, or 
-// bad List pointer. If it does, any behaviour is permitted (such as crashing).
-// HINT: Use assert(pList != NULL); just to add a nice check, but not required.
 
 // Makes a new, empty list, and returns its reference on success. 
 // Returns a NULL pointer on failure.

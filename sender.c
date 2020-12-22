@@ -14,8 +14,6 @@
     Sender thread
     Receive messages from keyboard thread
     Sends to remote computer
-    (Refer to Brian Fraser Threads, Condition Variables workshop)
-    (Also refer to Beej's Guide to Network Programming)
 */
 
 static pthread_t thread;

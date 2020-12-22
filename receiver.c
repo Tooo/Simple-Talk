@@ -15,7 +15,6 @@
     Receiever thread
     Receieve messages from remote computer
     Sends to screen thread
-    (Refer to Brian Fraser Sockets, Threads workshop)
 */
 
 static pthread_t thread;

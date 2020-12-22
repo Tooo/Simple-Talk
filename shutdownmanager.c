@@ -12,7 +12,6 @@
     Shutdown Manager Thread
     Locked when messaging system is active
     Starts when triggerShutdown is called
-    (Refer to Brian Fraser Shutdown of Threads workshop)
 */
 
 static pthread_t thread;
