@@ -6,7 +6,7 @@ This program will be multithreaded to allow concurrency.
 ## Installation
 1. Clone the repository
 ```bash
-git clone https://github.com/Toooo123/Simple-Talk.git
+git clone https://github.com/Tooo/Simple-Talk.git
 ```
 2. Make the objects and executable file: 
 ```bash
